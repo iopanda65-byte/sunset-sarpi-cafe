@@ -328,27 +328,7 @@ export default function About() {
       </section>
 
       {/* ══════════ MOBILE BOTTOM NAV ══════════ */}
-      <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-slate-950/95 backdrop-blur-md border-t border-white/5 flex pb-safe">
-        {[
-          { to: "/", icon: "🏠", label: "მთავარი" },
-          { to: "/product", icon: "🍽️", label: "მენიუ" },
-          { to: "/about", icon: "ℹ️", label: "შესახებ" },
-          { to: "/contact", icon: "📞", label: "კონტაქტი" },
-        ].map((item) => (
-          <Link
-            key={item.to}
-            to={item.to}
-            className={`flex-1 flex flex-col items-center justify-center py-3 gap-0.5 transition-colors ${
-              item.to === "/about"
-                ? "text-amber-400"
-                : "text-slate-400 hover:text-amber-400"
-            }`}
-          >
-            <span className="text-lg leading-none">{item.icon}</span>
-            <span className="text-[9px] font-medium">{item.label}</span>
-          </Link>
-        ))}
-      </nav>
+      <nav className="sm:hidden fixed bottom-0 left-0 right-0 ...">...</nav>
       <div className="sm:hidden h-20" />
     </div>
   );

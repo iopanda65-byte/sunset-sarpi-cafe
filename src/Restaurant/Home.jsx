@@ -431,25 +431,8 @@ export default function Home() {
       </section>
 
       {/* ══════════ MOBILE BOTTOM NAV ══════════ */}
-      <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-slate-950/95 backdrop-blur-md border-t border-white/5 flex">
-        {[
-          { to: "/", icon: "🏠", label: "მთავარი" },
-          { to: "/product", icon: "🍽️", label: "მენიუ" },
-          { to: "/about", icon: "ℹ️", label: "შესახებ" },
-          { to: "/contact", icon: "📞", label: "კონტაქტი" },
-        ].map((item) => (
-          <Link
-            key={item.to}
-            to={item.to}
-            className="flex-1 flex flex-col items-center justify-center py-3 gap-0.5 text-slate-400 hover:text-amber-400 active:scale-90 transition-all duration-200 group"
-          >
-            <span className="text-lg leading-none group-hover:-translate-y-0.5 transition-transform duration-300">
-              {item.icon}
-            </span>
-            <span className="text-[9px] font-medium">{item.label}</span>
-          </Link>
-        ))}
-      </nav>
+      {/* ══════════ MOBILE BOTTOM NAV ══════════ */}
+      <nav className="sm:hidden fixed bottom-0 left-0 right-0 ...">...</nav>
       <div className="sm:hidden h-16" />
     </div>
   );
