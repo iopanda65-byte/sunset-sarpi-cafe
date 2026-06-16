@@ -64,7 +64,6 @@ const FEATURES = [
   { icon: "🛍️", title: "წასაღები", desc: "Takeaway სერვისი ხელმისაწვდომია" },
 ];
 
-// ─── კომპონენტი ───
 export default function About() {
   return (
     <div className="bg-slate-50 min-h-screen font-sans text-slate-800 antialiased overflow-x-hidden">
@@ -123,7 +122,7 @@ export default function About() {
             </h1>
             <p className="text-slate-300 text-sm sm:text-base leading-relaxed max-w-lg mx-auto">
               Cafe Sunset — ეს არის ადგილი, სადაც ოჯახური სიყვარული კერძებში
-              ჩანს. სარფის სანაპიროზე, Black Sea-ს ხედით, ყოველ ვიზიტს
+              ჩანს. სარფის სანაპიროზე, შავი ზღვის ხედით, ყოველ ვიზიტს
               განსაკუთრებულს ვხდით.
             </p>
           </div>
@@ -168,14 +167,14 @@ export default function About() {
 
             <div className="space-y-4 text-sm sm:text-base text-slate-600 leading-relaxed">
               <p>
-                Cafe Sunset სარფის გულში მდებარეობს — ბათუმ-სარფის გზაზე, Black
-                Sea-ს სანაპიროსთან ახლოს. ჩვენი სამზარეულო ოჯახური რეცეპტებით და
+                Cafe Sunset სარფის გულში მდებარეობს — ბათუმ-სარფის გზაზე, შავი
+                ზღვის სანაპიროსთან ახლოს. ჩვენი სამზარეულო ოჯახური რეცეპტებით და
                 ახალი, ადგილობრივი პროდუქტებით მუშაობს.
               </p>
               <p>
                 ყველა კერძი ხელით, სიყვარულით მზადდება. ხაჭაპური სახლის ყველით,
                 ხინკალი — ხელნაკეთი, ბოსტნეული — ახლად მოსული. სტუმრები ამბობენ,
-                რომ პეტრუშკაც ბაღიდან მოდის! 🌿
+                რომ ოხრახუშიც კი პირდაპირ ბაღიდან მოდის! 🌿
               </p>
               <p>
                 4.8 ★ რეიტინგი 118 მიმოხილვით Google Maps-ზე ჩვენი საუკეთესო
@@ -187,7 +186,7 @@ export default function About() {
               {[
                 "ოჯახური სამზარეულო",
                 "სარფი",
-                "Black Sea View",
+                "ზღვის ხედი",
                 "ახალი პროდუქტები",
                 "ხელნაკეთი",
               ].map((tag) => (
@@ -285,7 +284,7 @@ export default function About() {
 
           <div className="text-center mt-8">
             <a
-              href="https://maps.google.com/?q=Cafe+Sunset+Sarpi"
+              href="https://maps.google.com"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-slate-200 hover:border-amber-400 text-slate-700 hover:text-amber-600 font-semibold rounded-xl text-sm transition-all duration-200"
@@ -309,7 +308,7 @@ export default function About() {
           </h2>
           <p className="text-slate-400 text-sm max-w-sm mx-auto">
             ოჯახური გარემო, ახალი კერძები, ზღვის ხედი — ყველაფერი, რაც საუკეთესო
-            სადილს ჭირდება.
+            სადილს სჭირდება.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center pt-1">
             <a
@@ -329,7 +328,7 @@ export default function About() {
       </section>
 
       {/* ══════════ MOBILE BOTTOM NAV ══════════ */}
-      <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-slate-950/95 backdrop-blur-md border-t border-white/5 flex">
+      <nav className="sm:hidden fixed bottom-0 left-0 right-0 z-50 bg-slate-950/95 backdrop-blur-md border-t border-white/5 flex pb-safe">
         {[
           { to: "/", icon: "🏠", label: "მთავარი" },
           { to: "/product", icon: "🍽️", label: "მენიუ" },
@@ -350,7 +349,7 @@ export default function About() {
           </Link>
         ))}
       </nav>
-      <div className="sm:hidden h-16" />
+      <div className="sm:hidden h-20" />
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 const PHONE = "555133181";
@@ -78,7 +78,7 @@ const MENU = [
     desc: "საქონლის ხორცი, სოკო, ნაღების სოუსი",
     price: "20 ₾",
     tag: "",
-    img: imgs.soup, // ფოლბექად ვიყენებთ წვნიანის ბაზას
+    img: imgs.soup,
   },
   {
     id: 7,
@@ -87,7 +87,7 @@ const MENU = [
     desc: "ქათმის ხორცი, პაპრიკა, ბოსტნეული",
     price: "16 ₾",
     tag: "",
-    img: imgs.gulashi, // შეიცვალა imgs.soup -> imgs.gulashi-თ
+    img: imgs.gulashi,
   },
   {
     id: 8,
@@ -168,38 +168,66 @@ const FALLBACK_COLORS = [
 
 export default function Product() {
   const [activeCat, setActiveCat] = useState("all");
+  // გვერდის ჩატვირთვის ანიმაციის სტეიტი
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    setIsVisible(true);
+  }, []);
 
   const filtered =
     activeCat === "all" ? MENU : MENU.filter((d) => d.cat === activeCat);
 
   return (
-    <div className="bg-slate-50 min-h-screen font-sans text-slate-800 antialiased overflow-x-hidden">
+    <div
+      className={`bg-slate-50 min-h-screen font-sans text-slate-800 antialiased overflow-x-hidden transition-all duration-700 ease-out ${
+        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+      }`}
+    >
       {/* ══════════ NAVBAR ══════════ */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-950/85 backdrop-blur-md border-b border-white/5">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-14 sm:h-16">
-          <Link to="/" className="text-white font-black text-lg tracking-tight">
-            🌅 <span className="text-amber-400">Cafe</span> Sunset
+          <Link
+            to="/"
+            className="text-white font-black text-lg tracking-tight group flex items-center gap-1"
+          >
+            <span className="group-hover:rotate-12 transition-transform duration-300">
+              🌅
+            </span>
+            <span className="text-amber-400">Cafe</span> Sunset
           </Link>
+
           <div className="hidden sm:flex items-center gap-6 text-sm text-slate-300">
-            <Link to="/" className="hover:text-amber-400 transition-colors">
+            <Link
+              to="/"
+              className="relative py-1 hover:text-amber-400 transition-colors duration-300 group"
+            >
               მთავარი
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-400 transition-all duration-300 group-hover:w-full" />
             </Link>
-            <Link to="/product" className="text-amber-400 font-semibold">
+            <Link
+              to="/product"
+              className="relative py-1 text-amber-400 font-semibold group"
+            >
               მენიუ
+              <span className="absolute bottom-0 left-0 w-full h-0.5 bg-amber-400" />
             </Link>
             <Link
               to="/about"
-              className="hover:text-amber-400 transition-colors"
+              className="relative py-1 hover:text-amber-400 transition-colors duration-300 group"
             >
               შესახებ
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-400 transition-all duration-300 group-hover:w-full" />
             </Link>
             <Link
               to="/contact"
-              className="hover:text-amber-400 transition-colors"
+              className="relative py-1 hover:text-amber-400 transition-colors duration-300 group"
             >
               კონტაქტი
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-400 transition-all duration-300 group-hover:w-full" />
             </Link>
           </div>
+
           <a
             href={`tel:${PHONE}`}
             className="px-4 py-2 bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-bold rounded-xl text-xs sm:text-sm transition-all duration-200"
@@ -260,7 +288,6 @@ export default function Product() {
 
       {/* ══════════ MENU GRID ══════════ */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
-        {/* კატეგორიის სათაური */}
         <div className="mb-6 sm:mb-8">
           <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900">
             {CATS.find((c) => c.key === activeCat)?.icon}{" "}
@@ -273,14 +300,13 @@ export default function Product() {
           {filtered.map((dish, i) => (
             <div
               key={dish.id}
-              className="group bg-white rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-200/60 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-amber-500/5 hover:border-amber-500/20 flex flex-col"
+              className="group bg-white rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-200/60 transition-all duration-500 hover:-translate-y-2 hover:shadow-xl hover:shadow-amber-500/10 hover:border-amber-500/30 flex flex-col"
             >
-              {/* სურათი */}
               <div className="relative h-44 sm:h-48 overflow-hidden bg-slate-100">
                 <img
                   src={dish.img}
                   alt={dish.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                   onError={(e) => {
                     e.target.style.display = "none";
                     e.target.parentNode.style.background =
@@ -297,11 +323,10 @@ export default function Product() {
                 )}
               </div>
 
-              {/* ტექსტი */}
               <div className="p-4 sm:p-5 flex flex-col flex-1">
                 <div className="flex items-start justify-between gap-2 flex-1">
                   <div>
-                    <h3 className="font-bold text-slate-900 text-sm sm:text-base tracking-tight leading-snug">
+                    <h3 className="font-bold text-slate-900 text-sm sm:text-base tracking-tight leading-snug group-hover:text-amber-600 transition-colors duration-300">
                       {dish.name}
                     </h3>
                     <p className="text-xs text-slate-500 mt-1 leading-relaxed">
@@ -328,8 +353,8 @@ export default function Product() {
 
       {/* ══════════ CTA ══════════ */}
       <section className="bg-slate-950 text-white py-14 sm:py-20 px-4 text-center relative overflow-hidden">
-        <div className="absolute -left-16 top-0 w-56 h-56 bg-amber-500/5 rounded-full blur-3xl" />
-        <div className="absolute right-0 bottom-0 w-48 h-48 bg-orange-500/5 rounded-full blur-3xl" />
+        <div className="absolute -left-16 top-0 w-56 h-56 bg-amber-500/5 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute right-0 bottom-0 w-48 h-48 bg-orange-500/5 rounded-full blur-3xl animate-pulse" />
         <div className="relative max-w-xl mx-auto space-y-4 sm:space-y-5">
           <h2 className="text-xl sm:text-3xl font-extrabold tracking-tight">
             მაგიდის დასაჯავშნად დარეკე
@@ -340,13 +365,13 @@ export default function Product() {
           <div className="flex flex-col sm:flex-row gap-3 justify-center pt-1">
             <a
               href={`tel:${PHONE}`}
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold rounded-2xl shadow-lg shadow-amber-500/20 transition-all duration-200 active:scale-[0.97] text-sm sm:text-base"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-bold rounded-2xl shadow-lg shadow-amber-500/20 transition-all duration-300 hover:shadow-amber-500/40 hover:-translate-y-0.5 active:scale-[0.97] text-sm sm:text-base"
             >
               📞 555 13 31 81
             </a>
             <Link
               to="/contact"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/5 hover:bg-white/10 text-white font-semibold rounded-2xl border border-white/10 transition-all duration-200 text-sm sm:text-base"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/5 hover:bg-white/10 text-white font-semibold rounded-2xl border border-white/10 transition-all duration-200 hover:-translate-y-0.5 active:scale-[0.97] text-sm sm:text-base"
             >
               📍 მისამართი
             </Link>
@@ -365,13 +390,15 @@ export default function Product() {
           <Link
             key={item.to}
             to={item.to}
-            className={`flex-1 flex flex-col items-center justify-center py-3 gap-0.5 transition-colors ${
+            className={`flex-1 flex flex-col items-center justify-center py-3 gap-0.5 active:scale-90 transition-all duration-200 group ${
               item.to === "/product"
                 ? "text-amber-400"
                 : "text-slate-400 hover:text-amber-400"
             }`}
           >
-            <span className="text-lg leading-none">{item.icon}</span>
+            <span className="text-lg leading-none group-hover:-translate-y-0.5 transition-transform duration-300">
+              {item.icon}
+            </span>
             <span className="text-[9px] font-medium">{item.label}</span>
           </Link>
         ))}

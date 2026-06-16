@@ -1,8 +1,8 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
 // ─── სურათები — /public საქაღალდეში ჩააგდე ამ სახელებით ───
-// assets from image_0.png
-const imgXedi = "/xedi.png"; // image_0.png header file
+const imgXedi = "/xedi.png";
 const imgAssets = [
   "/chai.png",
   "/coffee.png",
@@ -17,7 +17,7 @@ const imgAssets = [
   "/xinkali.png",
 ];
 
-const imgHero = imgXedi; // For the top header, we'll use xedi as the "hero" background
+const imgHero = imgXedi;
 const imgFood1 = imgAssets[8]; // xachapuri
 const imgFood2 = imgAssets[10]; // xinkali
 const imgFood3 = imgAssets[4]; // ojaxuri
@@ -85,45 +85,56 @@ const PHONE = "555133181";
 
 // ─── კომპონენტი ───
 export default function Home() {
+  // გვერდზე გადასვლის/ჩატვირთვის ანიმაციის სტეიტი
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    setIsVisible(true);
+  }, []);
+
   return (
-    <div className="bg-slate-50 min-h-screen font-sans text-slate-800 antialiased overflow-x-hidden">
+    <div
+      className={`bg-slate-50 min-h-screen font-sans text-slate-800 antialiased overflow-x-hidden transition-all duration-700 ease-out ${
+        isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+      }`}
+    >
       {/* ══════════ NAVBAR ══════════ */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-950/85 backdrop-blur-md border-b border-white/5">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-14 sm:h-16">
           {/* ლოგო */}
-          <Link to="/" className="text-white font-black text-lg tracking-tight">
-            🌅 <span className="text-amber-400">Cafe</span> Sunset
+          <Link
+            to="/"
+            className="text-white font-black text-lg tracking-tight group flex items-center gap-1"
+          >
+            <span className="group-hover:rotate-12 transition-transform duration-300">
+              🌅
+            </span>
+            <span className="text-amber-400">Cafe</span> Sunset
           </Link>
 
-          {/* ლინკები */}
+          {/* ლინკები ხაზის ეფექტით */}
           <div className="hidden sm:flex items-center gap-6 text-sm text-slate-300">
-            <Link to="/" className="hover:text-amber-400 transition-colors">
-              მთავარი
-            </Link>
-            <Link
-              to="/product"
-              className="hover:text-amber-400 transition-colors"
-            >
-              მენიუ
-            </Link>
-            <Link
-              to="/about"
-              className="hover:text-amber-400 transition-colors"
-            >
-              ჩვენ შესახებ
-            </Link>
-            <Link
-              to="/contact"
-              className="hover:text-amber-400 transition-colors"
-            >
-              კონტაქტი
-            </Link>
+            {["მთავარი", "მენიუ", "ჩვენ შესახებ", "კონტაქტი"].map(
+              (text, idx) => {
+                const paths = ["/", "/product", "/about", "/contact"];
+                return (
+                  <Link
+                    key={idx}
+                    to={paths[idx]}
+                    className="relative py-1 hover:text-amber-400 transition-colors duration-300 group"
+                  >
+                    {text}
+                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-400 transition-all duration-300 group-hover:w-full" />
+                  </Link>
+                );
+              },
+            )}
           </div>
 
           {/* CTA ღილაკი */}
           <a
             href={`tel:${PHONE}`}
-            className="px-4 py-2 bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-bold rounded-xl text-xs sm:text-sm transition-all duration-200"
+            className="px-4 py-2 bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-bold rounded-xl text-xs sm:text-sm transition-all duration-200 shadow-md hover:shadow-amber-500/10"
           >
             📞 დარეზერვება
           </a>
@@ -132,14 +143,12 @@ export default function Home() {
 
       {/* ══════════ HERO ══════════ */}
       <section className="relative bg-gradient-to-br from-slate-950 via-slate-900 to-amber-950 text-white overflow-hidden pt-14 sm:pt-16">
-        {/* ფონის ბლური ლაქები */}
         <div className="absolute top-0 right-0 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 w-56 h-56 bg-orange-500/8 rounded-full blur-2xl pointer-events-none" />
         <div className="absolute inset-0 opacity-[0.025] bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:20px_20px]" />
 
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 lg:py-32">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-            {/* მარცხენა ტექსტი */}
             <div className="space-y-5 sm:space-y-7 text-center lg:text-left">
               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[11px] sm:text-xs font-bold tracking-widest uppercase">
                 🌅 სარფი, ბათუმი · ოჯახური სამზარეულო
@@ -160,22 +169,21 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row gap-3 pt-1 max-w-xs mx-auto sm:max-w-none lg:mx-0">
                 <Link
                   to="/product"
-                  className="flex-1 sm:flex-none px-7 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-bold rounded-2xl shadow-lg shadow-amber-500/20 transition-all duration-200 active:scale-[0.97] text-center text-sm sm:text-base"
+                  className="flex-1 sm:flex-none px-7 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-bold rounded-2xl shadow-lg shadow-amber-500/20 transition-all duration-200 active:scale-[0.97] text-center text-sm sm:text-base hover:shadow-amber-500/30 hover:-translate-y-0.5"
                 >
                   სრული მენიუ
                 </Link>
                 <a
                   href={`tel:${PHONE}`}
-                  className="flex-1 sm:flex-none px-7 py-4 bg-white/5 hover:bg-white/10 text-white font-semibold rounded-2xl text-center border border-white/10 transition-all duration-200 text-sm sm:text-base"
+                  className="flex-1 sm:flex-none px-7 py-4 bg-white/5 hover:bg-white/10 text-white font-semibold rounded-2xl text-center border border-white/10 transition-all duration-200 text-sm sm:text-base hover:-translate-y-0.5 active:scale-[0.97]"
                 >
                   📞 მაგიდის დაჯავშნა
                 </a>
               </div>
             </div>
 
-            {/* მარჯვენა სურათი */}
             <div className="hidden lg:flex justify-center">
-              <div className="w-full max-w-sm h-72 xl:h-80 rounded-3xl overflow-hidden shadow-2xl border border-white/10 relative group">
+              <div className="w-full max-w-sm h-72 xl:h-80 rounded-3xl overflow-hidden shadow-2xl border border-white/10 relative group transition-all duration-500 hover:border-amber-500/20">
                 <img
                   src={imgHero}
                   alt="Cafe Sunset"
@@ -202,9 +210,9 @@ export default function Home() {
           {STATS.map((s, i) => (
             <div
               key={i}
-              className="flex flex-col items-center justify-center py-5 sm:py-7 px-3"
+              className="flex flex-col items-center justify-center py-5 sm:py-7 px-3 hover:bg-slate-50/50 transition-colors duration-300 cursor-default group"
             >
-              <p className="text-lg sm:text-2xl lg:text-3xl font-black text-slate-900 leading-none">
+              <p className="text-lg sm:text-2xl lg:text-3xl font-black text-slate-900 leading-none group-hover:scale-105 transition-transform duration-300">
                 {s.val}
               </p>
               <p className="text-[10px] sm:text-xs text-slate-500 font-medium mt-1.5 text-center leading-snug">
@@ -231,9 +239,12 @@ export default function Home() {
           </div>
           <Link
             to="/product"
-            className="text-xs sm:text-sm font-bold text-slate-900 hover:text-amber-600 transition-colors flex items-center gap-1 shrink-0 ml-4"
+            className="text-xs sm:text-sm font-bold text-slate-900 hover:text-amber-600 transition-colors flex items-center gap-1 shrink-0 ml-4 group"
           >
-            სრული მენიუ <span>→</span>
+            სრული მენიუ{" "}
+            <span className="group-hover:translate-x-1 transition-transform duration-300">
+              →
+            </span>
           </Link>
         </div>
 
@@ -241,14 +252,13 @@ export default function Home() {
           {PREVIEW_DISHES.map((dish, i) => (
             <div
               key={dish.id}
-              className="group flex-shrink-0 w-[72vw] sm:w-auto snap-start bg-white rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-200/60 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-amber-500/5 hover:border-amber-500/20 flex flex-col"
+              className="group flex-shrink-0 w-[72vw] sm:w-auto snap-start bg-white rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-200/60 transition-all duration-500 hover:-translate-y-2 hover:shadow-xl hover:shadow-amber-500/10 hover:border-amber-500/30 flex flex-col"
             >
-              {/* სურათი */}
               <div className="relative h-44 sm:h-52 overflow-hidden bg-slate-100">
                 <img
                   src={dish.img}
                   alt={dish.name}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                   onError={(e) => {
                     e.target.style.display = "none";
                     const colors = [
@@ -267,10 +277,9 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* ინფო */}
               <div className="p-4 sm:p-5 flex flex-col flex-1">
                 <div className="flex-1 mb-4">
-                  <h3 className="font-bold text-slate-900 text-sm sm:text-base tracking-tight">
+                  <h3 className="font-bold text-slate-900 text-sm sm:text-base tracking-tight group-hover:text-amber-600 transition-colors duration-300">
                     {dish.name}
                   </h3>
                   <p className="text-xs text-slate-500 mt-1">{dish.desc}</p>
@@ -309,7 +318,7 @@ export default function Home() {
             {REVIEWS.map((r, i) => (
               <div
                 key={i}
-                className="flex-shrink-0 w-[80vw] sm:w-auto snap-start bg-white rounded-2xl sm:rounded-3xl border border-slate-200/60 p-5 sm:p-6 flex flex-col gap-4 hover:border-amber-500/30 hover:shadow-md transition-all duration-300"
+                className="flex-shrink-0 w-[80vw] sm:w-auto snap-start bg-white rounded-2xl sm:rounded-3xl border border-slate-200/60 p-5 sm:p-6 flex flex-col gap-4 hover:border-amber-500/20 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
@@ -323,7 +332,7 @@ export default function Home() {
                     {"★".repeat(r.rating)}
                   </div>
                 </div>
-                <p className="text-sm text-slate-600 leading-relaxed">
+                <p className="text-sm text-slate-600 leading-relaxed italic">
                   "{r.text}"
                 </p>
               </div>
@@ -348,13 +357,16 @@ export default function Home() {
             href="https://maps.google.com/?q=Cafe+Sunset+Sarpi+Georgia"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs sm:text-sm font-bold text-slate-900 hover:text-amber-600 transition-colors flex items-center gap-1 shrink-0 ml-4"
+            className="text-xs sm:text-sm font-bold text-slate-900 hover:text-amber-600 transition-colors flex items-center gap-1 shrink-0 ml-4 group"
           >
-            Maps-ში გახსნა <span>→</span>
+            Maps-ში გახსნა{" "}
+            <span className="group-hover:translate-x-1 transition-transform duration-300">
+              →
+            </span>
           </a>
         </div>
 
-        <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-200 shadow-sm">
+        <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-200 shadow-sm group">
           <iframe
             title="Cafe Sunset მდებარეობა"
             src="https://maps.google.com/maps?q=Cafe+Sunset+Sarpi+Georgia&z=16&output=embed"
@@ -365,17 +377,15 @@ export default function Home() {
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"
           />
-          {/* badge ზედა მარცხნივ */}
           <div className="absolute top-3 left-3 flex items-center gap-1.5 px-3 py-2 bg-slate-950/80 backdrop-blur-sm text-white text-xs font-semibold rounded-xl pointer-events-none">
             <span>🌅</span>
             <span>Cafe Sunset · სარფი</span>
           </div>
-          {/* გახსნის ღილაკი ქვედა მარჯვნივ */}
           <a
             href="https://maps.google.com/?q=Cafe+Sunset+Sarpi+Georgia"
             target="_blank"
             rel="noopener noreferrer"
-            className="absolute bottom-3 right-3 flex items-center gap-1.5 px-3 py-2 bg-white/95 backdrop-blur-sm border border-slate-200 hover:border-amber-400 hover:bg-amber-50 text-slate-700 hover:text-amber-700 font-semibold text-xs rounded-xl shadow-md transition-all duration-200"
+            className="absolute bottom-3 right-3 flex items-center gap-1.5 px-3 py-2 bg-white/95 backdrop-blur-sm border border-slate-200 hover:border-amber-400 hover:bg-amber-50 text-slate-700 hover:text-amber-700 font-semibold text-xs rounded-xl shadow-md transition-all duration-300 hover:scale-105 active:scale-95"
           >
             <span>📍</span>
             <span>Maps-ში გახსნა</span>
@@ -385,8 +395,8 @@ export default function Home() {
 
       {/* ══════════ CTA ══════════ */}
       <section className="bg-slate-950 text-white py-16 sm:py-24 px-4 text-center relative overflow-hidden">
-        <div className="absolute -left-16 -top-16 w-48 h-48 sm:w-72 sm:h-72 bg-amber-500/5 rounded-full blur-3xl" />
-        <div className="absolute right-0 bottom-0 w-56 h-56 bg-orange-500/5 rounded-full blur-3xl" />
+        <div className="absolute -left-16 -top-16 w-48 h-48 sm:w-72 sm:h-72 bg-amber-500/5 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute right-0 bottom-0 w-56 h-56 bg-orange-500/5 rounded-full blur-3xl animate-pulse" />
 
         <div className="relative max-w-2xl mx-auto space-y-4 sm:space-y-6">
           <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[11px] font-bold tracking-widest uppercase">
@@ -403,13 +413,13 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
             <a
               href={`tel:${PHONE}`}
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-bold rounded-2xl shadow-lg shadow-amber-500/20 transition-all duration-200 active:scale-[0.97] text-sm sm:text-base"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-bold rounded-2xl shadow-lg shadow-amber-500/20 transition-all duration-300 hover:shadow-amber-500/40 hover:-translate-y-0.5 active:scale-[0.97]"
             >
               📞 555 13 31 81
             </a>
             <Link
               to="/contact"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/5 hover:bg-white/10 text-white font-semibold rounded-2xl border border-white/10 transition-all duration-200 text-sm sm:text-base"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/5 hover:bg-white/10 text-white font-semibold rounded-2xl border border-white/10 transition-all duration-300 hover:border-white/20 hover:-translate-y-0.5 active:scale-[0.97]"
             >
               📍 მისამართი და საათები
             </Link>
@@ -431,14 +441,15 @@ export default function Home() {
           <Link
             key={item.to}
             to={item.to}
-            className="flex-1 flex flex-col items-center justify-center py-3 gap-0.5 text-slate-400 hover:text-amber-400 transition-colors"
+            className="flex-1 flex flex-col items-center justify-center py-3 gap-0.5 text-slate-400 hover:text-amber-400 active:scale-90 transition-all duration-200 group"
           >
-            <span className="text-lg leading-none">{item.icon}</span>
+            <span className="text-lg leading-none group-hover:-translate-y-0.5 transition-transform duration-300">
+              {item.icon}
+            </span>
             <span className="text-[9px] font-medium">{item.label}</span>
           </Link>
         ))}
       </nav>
-      {/* მობილ ბოტ ნავის სიმაღლის კომპენსაცია */}
       <div className="sm:hidden h-16" />
     </div>
   );
