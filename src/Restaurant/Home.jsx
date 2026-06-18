@@ -51,7 +51,7 @@ const PREVIEW_DISHES = [
     id: 3,
     name: "ოჯახური",
     desc: "ახალი ხორცი, ბოსტნეული, ღვინის სოუსი",
-    price: "18 ₾",
+    price: "15₾",
     tag: "შეფის არჩევანი",
     img: imgFood3,
   },
