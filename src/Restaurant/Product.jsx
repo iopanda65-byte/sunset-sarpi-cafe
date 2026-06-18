@@ -67,7 +67,7 @@ const MENU = [
     cat: "main",
     name: "ოჯახური",
     desc: "ღორის ხორცი, ბოსტნეული, ღვინის სოუსი",
-    price: "18 ₾",
+    price: "15 ₾",
     tag: "შეფის არჩევანი",
     img: imgs.ojakhuri,
   },
