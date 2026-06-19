@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { supabase } from "./supabaseClient";
 
 // ─── სურათები — /public საქაღალდეში ჩააგდე ამ სახელებით ───
 const imgXedi = "/xedi.png";
@@ -25,7 +26,7 @@ const imgFood3 = imgAssets[4]; // ojaxuri
 // ─── მონაცემები ───
 const STATS = [
   { val: "4.8 ★", label: "საშ. შეფასება" },
-  { val: "118", label: "მიმოხილვა" },
+  { val: "0", label: "მიმოხილვა" }, // ბაზიდან წამოღებულ რაოდენობას დინამიურად დავსვამთ ქვემოთ
   { val: "10–20 ₾", label: "ერთ ადამიანზე" },
   { val: "სარფი", label: "მდებარეობა" },
 ];
@@ -57,40 +58,73 @@ const PREVIEW_DISHES = [
   },
 ];
 
-const REVIEWS = [
-  {
-    avatar: "AL",
-    name: "Athena Lin",
-    time: "3 კვირის წინ",
-    rating: 5,
-    text: "The walnut salad was so flavorful! They had TURKISH tea — perfection. Absolutely loved this place.",
-  },
-  {
-    avatar: "AA",
-    name: "Anna Ladovics",
-    time: "8 თვის წინ",
-    rating: 5,
-    text: "One of the most delicious meals here. Fantastic view, great service — quick and friendly. Highly recommend!",
-  },
-  {
-    avatar: "PI",
-    name: "Panda Io",
-    time: "10 თვის წინ",
-    rating: 5,
-    text: "უგემრიელესი! კვება 5, სერვისი 5, ატმოსფერო 5. წყნარი გარემო, ბავშვებისთვის იდეალური.",
-  },
-];
-
 const PHONE = "555133181";
 
 // ─── კომპონენტი ───
 export default function Home() {
-  // გვერდზე გადასვლის/ჩატვირთვის ანიმაციის სტეიტი
   const [isVisible, setIsVisible] = useState(false);
 
+  // ─── სტეიტი მიმოხილვებისთვის (ვიწყებთ ცარიელი მასივით) ───
+  const [reviews, setReviews] = useState([]);
+
+  // ─── ფორმის სტეიტები ───
+  const [newName, setNewName] = useState("");
+  const [newText, setNewText] = useState("");
+  const [newRating, setNewRating] = useState(5);
+
+  // ბაზიდან კომენტარების წამოღება საიტის ჩატვირთვისას
   useEffect(() => {
     setIsVisible(true);
+
+    const fetchReviews = async () => {
+      const { data, error } = await supabase
+        .from("reviews")
+        .select("*")
+        .order("created_at", { ascending: false }); // ახალი კომენტარები პირველი გამოჩნდება
+
+      if (!error && data) {
+        setReviews(data);
+      } else if (error) {
+        console.error("შეცდომა კომენტარების წამოღებისას:", error.message);
+      }
+    };
+
+    fetchReviews();
   }, []);
+
+  // კომენტარის გაგზავნის ფუნქცია Supabase-ში
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    if (!newName.trim() || !newText.trim()) return;
+
+    // სახელის ინიციალების აღება ავატარისთვის (მაგ: დავითი -> დ)
+    const avatarInitials = newName.trim().slice(0, 2).toUpperCase();
+
+    const newReviewObj = {
+      name: newName,
+      text: newText,
+      rating: newRating,
+      avatar: avatarInitials,
+    };
+
+    // ბაზაში ჩაწერა
+    const { data, error } = await supabase
+      .from("reviews")
+      .insert([newReviewObj])
+      .select();
+
+    if (!error && data) {
+      // თუ წარმატებით ჩაიწერა, მომენტალურად ვამატებთ ეკრანზე
+      setReviews([data[0], ...reviews]);
+
+      // ფორმის გასუფთავება
+      setNewName("");
+      setNewText("");
+      setNewRating(5);
+    } else if (error) {
+      console.error("შეცდომა კომენტარის გაგზავნისას:", error.message);
+    }
+  };
 
   return (
     <div
@@ -101,7 +135,6 @@ export default function Home() {
       {/* ══════════ NAVBAR ══════════ */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-950/85 backdrop-blur-md border-b border-white/5">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-14 sm:h-16">
-          {/* ლოგო */}
           <Link
             to="/"
             className="text-white font-black text-lg tracking-tight group flex items-center gap-1"
@@ -112,7 +145,6 @@ export default function Home() {
             <span className="text-amber-400">Cafe</span> Sunset
           </Link>
 
-          {/* ლინკები ხაზის ეფექტით */}
           <div className="hidden sm:flex items-center gap-6 text-sm text-slate-300">
             {["მთავარი", "მენიუ", "ჩვენ შესახებ", "კონტაქტი"].map(
               (text, idx) => {
@@ -131,7 +163,6 @@ export default function Home() {
             )}
           </div>
 
-          {/* CTA ღილაკი */}
           <a
             href={`tel:${PHONE}`}
             className="px-4 py-2 bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-bold rounded-xl text-xs sm:text-sm transition-all duration-200 shadow-md hover:shadow-amber-500/10"
@@ -196,7 +227,7 @@ export default function Home() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 to-transparent" />
                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-slate-950/80 text-amber-400 border border-amber-500/20 px-4 py-1.5 rounded-lg text-xs font-black tracking-wider uppercase whitespace-nowrap backdrop-blur-sm">
-                  ★ 4.8 · 118 მიმოხილვა
+                  ★ 4.8 · {reviews.length} მიმოხილვა
                 </div>
               </div>
             </div>
@@ -213,7 +244,7 @@ export default function Home() {
               className="flex flex-col items-center justify-center py-5 sm:py-7 px-3 hover:bg-slate-50/50 transition-colors duration-300 cursor-default group"
             >
               <p className="text-lg sm:text-2xl lg:text-3xl font-black text-slate-900 leading-none group-hover:scale-105 transition-transform duration-300">
-                {s.val}
+                {s.label === "მიმოხილვა" ? reviews.length : s.val}
               </p>
               <p className="text-[10px] sm:text-xs text-slate-500 font-medium mt-1.5 text-center leading-snug">
                 {s.label}
@@ -304,20 +335,20 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10 sm:mb-14 space-y-2">
             <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-700 text-[11px] font-bold tracking-widest uppercase">
-              ⭐ Google-ის მიმოხილვები
+              ⭐ სტუმრების შეფასებები
             </span>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
               სტუმრები ამბობენ
             </h2>
             <p className="text-sm text-slate-500">
-              4.8 ★ · 118 მიმოხილვა Google Maps-ზე
+              4.8 ★ · {reviews.length} მიმოხილვა საიტზე
             </p>
           </div>
 
-          <div className="flex gap-4 overflow-x-auto pb-3 snap-x snap-mandatory sm:grid sm:grid-cols-3 sm:overflow-visible sm:pb-0 sm:gap-6">
-            {REVIEWS.map((r, i) => (
+          <div className="flex gap-4 overflow-x-auto pb-3 snap-x snap-mandatory sm:grid sm:grid-cols-3 sm:overflow-visible sm:pb-0 sm:gap-6 mb-12">
+            {reviews.map((r, i) => (
               <div
-                key={i}
+                key={r.id || i}
                 className="flex-shrink-0 w-[80vw] sm:w-auto snap-start bg-white rounded-2xl sm:rounded-3xl border border-slate-200/60 p-5 sm:p-6 flex flex-col gap-4 hover:border-amber-500/20 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
               >
                 <div className="flex items-center gap-3">
@@ -326,7 +357,11 @@ export default function Home() {
                   </div>
                   <div>
                     <p className="font-bold text-slate-900 text-sm">{r.name}</p>
-                    <p className="text-[11px] text-slate-400">{r.time}</p>
+                    <p className="text-[11px] text-slate-400">
+                      {r.created_at
+                        ? new Date(r.created_at).toLocaleDateString("ka-GE")
+                        : "ახლახან"}
+                    </p>
                   </div>
                   <div className="ml-auto text-amber-400 text-sm font-bold">
                     {"★".repeat(r.rating)}
@@ -337,6 +372,70 @@ export default function Home() {
                 </p>
               </div>
             ))}
+          </div>
+
+          {/* ─── ახალი ფორმა კომენტარის დასაწერად ─── */}
+          <div className="max-w-xl mx-auto bg-white border border-slate-200 p-6 sm:p-8 rounded-3xl shadow-sm">
+            <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+              ✍️ დატოვე შენი შეფასება
+            </h3>
+
+            <form onSubmit={handleReviewSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
+                  შენი სახელი
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="მაგ: დავითი"
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-amber-500 transition-colors"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
+                  შეფასება (ვარსკვლავები)
+                </label>
+                <div className="flex gap-2 text-2xl">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setNewRating(star)}
+                      className={`transition-transform duration-100 active:scale-90 ${
+                        star <= newRating ? "text-amber-400" : "text-slate-200"
+                      }`}
+                    >
+                      ★
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
+                  შენი აზრი (რა მოგეწონა / რა არა)
+                </label>
+                <textarea
+                  required
+                  rows="3"
+                  placeholder="დაწერე შენი შთაბეჭდილება კერძებზე, სერვისზე..."
+                  value={newText}
+                  onChange={(e) => setNewText(e.target.value)}
+                  className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-amber-500 transition-colors resize-none"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="w-full py-3.5 bg-amber-500 hover:bg-amber-400 active:scale-[0.98] text-slate-950 font-bold rounded-xl text-sm transition-all duration-200 shadow-md"
+              >
+                გაგზავნა ✨
+              </button>
+            </form>
           </div>
         </div>
       </section>
@@ -430,7 +529,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ══════════ MOBILE BOTTOM NAV ══════════ */}
       {/* ══════════ MOBILE BOTTOM NAV ══════════ */}
       <nav className="sm:hidden fixed bottom-0 left-0 right-0 ...">...</nav>
       <div className="sm:hidden h-16" />
