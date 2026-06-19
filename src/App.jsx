@@ -1,3 +1,4 @@
+import { useEffect } from "react"; // ◄ დაემატა useEffect
 import {
   BrowserRouter as Router,
   Routes,
@@ -21,6 +22,11 @@ const pageVariants = {
 // ცალკე შიდა კომპონენტი, რათა useLocation-მა სწორად იმუშაოს ანიმაციაზე
 function AnimatedRoutes() {
   const location = useLocation();
+
+  // ◄ აი აქ დაემატა სქროლის ავტომატური აყვანა ყოველ გადასვლაზე
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   return (
     <AnimatePresence mode="wait">
