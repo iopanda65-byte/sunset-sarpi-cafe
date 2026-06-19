@@ -98,20 +98,40 @@ export default function Home() {
       avatar: avatarInitials,
     };
 
-    const { data, error } = await supabase
-      .from("reviews")
-      .insert([newReviewObj])
-      .select();
+    try {
+      // აქ დაემატა select() სწორად, პლუს დაზღვევის მიზნით კოდი მოექცა try/catch/finally-ში
+      const { data, error } = await supabase
+        .from("reviews")
+        .insert([newReviewObj])
+        .select();
 
-    setLoadingReview(false);
-
-    if (!error && data && data.length > 0) {
-      setReviews([data[0], ...reviews]);
-      setNewName("");
-      setNewText("");
-      setNewRating(5);
-    } else if (error) {
-      console.error("შეცდომა კომენტარის გაგზავნისას:", error.message);
+      if (error) {
+        console.error("შეცდომა კომენტარის გაგზავნისას:", error.message);
+        alert("ვერ მოხერხდა გაგზავნა: " + error.message);
+      } else if (data && data.length > 0) {
+        // თუ ბაზამ წარმატებით დააბრუნა ახალი ჩანაწერი
+        setReviews([data[0], ...reviews]);
+        setNewName("");
+        setNewText("");
+        setNewRating(5);
+      } else {
+        // ფორს-მაჟორული შემთხვევისთვის, თუ მონაცემი ბაზაში ჩავარდა, მაგრამ 'data' მაინც ცარიელი მოვიდა
+        // ლოკალურად ვამატებთ მიმდინარე დროით, რომ მომხმარებელმა ეგრევე დაინახოს
+        const fallbackReview = {
+          ...newReviewObj,
+          id: Date.now(),
+          created_at: new Date().toISOString(),
+        };
+        setReviews([fallbackReview, ...reviews]);
+        setNewName("");
+        setNewText("");
+        setNewRating(5);
+      }
+    } catch (err) {
+      console.error("სერვერული შეცდომა:", err);
+    } finally {
+      // ეს ბლოკი ნებისმიერ შემთხვევაში გააჩერებს ლოდინის სტატუსს (იგზავნება... რეჟიმს)
+      setLoadingReview(false);
     }
   };
 
