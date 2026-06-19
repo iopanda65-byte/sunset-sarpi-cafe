@@ -89,7 +89,12 @@ export default function Home() {
     if (!newName.trim() || !newText.trim() || loadingReview) return;
 
     setLoadingReview(true);
-    const avatarInitials = newName.trim().slice(0, 2).toUpperCase();
+
+    // 🛠️ გასწორებული ლოგიკა: ვამოწმებთ არის თუ არა სახელი მხოლოდ ლათინური ასოებით
+    const isLatin = /^[a-zA-Z\s]+$/.test(newName.trim());
+    const avatarInitials = isLatin
+      ? newName.trim().slice(0, 2).toUpperCase()
+      : "👤";
 
     const newReviewObj = {
       name: newName.trim(),
@@ -99,7 +104,6 @@ export default function Home() {
     };
 
     try {
-      // აქ დაემატა select() სწორად, პლუს დაზღვევის მიზნით კოდი მოექცა try/catch/finally-ში
       const { data, error } = await supabase
         .from("reviews")
         .insert([newReviewObj])
@@ -109,14 +113,11 @@ export default function Home() {
         console.error("შეცდომა კომენტარის გაგზავნისას:", error.message);
         alert("ვერ მოხერხდა გაგზავნა: " + error.message);
       } else if (data && data.length > 0) {
-        // თუ ბაზამ წარმატებით დააბრუნა ახალი ჩანაწერი
         setReviews([data[0], ...reviews]);
         setNewName("");
         setNewText("");
         setNewRating(5);
       } else {
-        // ფორს-მაჟორული შემთხვევისთვის, თუ მონაცემი ბაზაში ჩავარდა, მაგრამ 'data' მაინც ცარიელი მოვიდა
-        // ლოკალურად ვამატებთ მიმდინარე დროით, რომ მომხმარებელმა ეგრევე დაინახოს
         const fallbackReview = {
           ...newReviewObj,
           id: Date.now(),
@@ -130,7 +131,6 @@ export default function Home() {
     } catch (err) {
       console.error("სერვერული შეცდომა:", err);
     } finally {
-      // ეს ბლოკი ნებისმიერ შემთხვევაში გააჩერებს ლოდინის სტატუსს (იგზავნება... რეჟიმს)
       setLoadingReview(false);
     }
   };
