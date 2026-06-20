@@ -1,27 +1,5 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { supabase } from "../supabaseClient";
-
-// ─── სურათები — /public საქაღალდეში ───
-const imgXedi = "/xedi.png";
-const imgAssets = [
-  "/chai.png",
-  "/coffee.png",
-  "/limonati.png",
-  "/nigvzsalata.png",
-  "/ojaxuri.png",
-  "/Piure.png",
-  "/salata.png",
-  "/supi.png",
-  "/xachapuri.png",
-  "/xarcho.png",
-  "/xinkali.png",
-];
-
-const imgHero = imgXedi;
-const imgFood1 = imgAssets[8]; // xachapuri
-const imgFood2 = imgAssets[10]; // xinkali
-const imgFood3 = imgAssets[4]; // ojaxuri
 
 const PREVIEW_DISHES = [
   {
@@ -30,7 +8,7 @@ const PREVIEW_DISHES = [
     desc: "ახალი ცომი, სახლის ყველი, კვერცხი",
     price: "12 ₾",
     tag: "სახლის რეცეპტი",
-    img: imgFood1,
+    img: "/xachapuri.png",
   },
   {
     id: 2,
@@ -38,7 +16,7 @@ const PREVIEW_DISHES = [
     desc: "ხელნაკეთი, საქონლის ხორცი, სუნელები",
     price: "1.5 ₾ / ც",
     tag: "საუკეთესო",
-    img: imgFood2,
+    img: "/xinkali.png",
   },
   {
     id: 3,
@@ -46,96 +24,82 @@ const PREVIEW_DISHES = [
     desc: "ახალი ხორცი, ბოსტნეული, ღვინის სოუსი",
     price: "15 ₾",
     tag: "შეფის არჩევანი",
-    img: imgFood3,
+    img: "/ojaxuri.png",
+  },
+];
+
+// საწყისი ლამაზი მიმოხილვები, რომლებიც ყოველთვის გამოჩნდება საიტზე
+const INITIAL_REVIEWS = [
+  {
+    id: 1,
+    name: "გიორგი",
+    text: "საუკეთესო ხაჭაპურია მთელ სანაპიროზე! გარემოც ძალიან მყუდროა.",
+    rating: 5,
+    avatar: "👤",
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: 2,
+    name: "ნინო",
+    text: "ხინკალი იყო უგემრიელესი, წვენით სავსე. აუცილებლად დავბრუნდებით!",
+    rating: 5,
+    avatar: "👤",
+    created_at: new Date().toISOString(),
   },
 ];
 
 const PHONE = "555133181";
 const FORMATTED_PHONE = "555 13 31 81";
+const NAV_LINKS = [
+  { text: "მთავარი", path: "/" },
+  { text: "მენიუ", path: "/product" },
+  { text: "ჩვენ შესახებ", path: "/about" },
+  { text: "კონტაქტი", path: "/contact" },
+];
 
 export default function Home() {
   const [isVisible, setIsVisible] = useState(false);
-  const [reviews, setReviews] = useState([]);
-  const [loadingReview, setLoadingReview] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // ─── ფორმის სტეიტები ───
+  // მიმოხილვები ინახება პირდაპირ აქ, ლოკალურად
+  const [reviews, setReviews] = useState(INITIAL_REVIEWS);
+
+  // ფორმის სტეიტები
   const [newName, setNewName] = useState("");
   const [newText, setNewText] = useState("");
   const [newRating, setNewRating] = useState(5);
 
-  // ბაზიდან კომენტარების წამოღება
   useEffect(() => {
     setIsVisible(true);
-
-    const fetchReviews = async () => {
-      const { data, error } = await supabase
-        .from("reviews")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (!error && data) {
-        setReviews(data);
-      } else if (error) {
-        console.error("შეცდომა კომენტარების წამოღებისას:", error.message);
-      }
-    };
-
-    fetchReviews();
   }, []);
 
-  // კომენტარის გაგზავნის ფუნქცია
-  const handleReviewSubmit = async (e) => {
+  const handleReviewSubmit = (e) => {
     e.preventDefault();
-    if (!newName.trim() || !newText.trim() || loadingReview) return;
+    if (!newName.trim() || !newText.trim()) return;
 
-    setLoadingReview(true);
-
-    // 🛠️ გასწორებული ლოგიკა: ვამოწმებთ არის თუ არა სახელი მხოლოდ ლათინური ასოებით
     const isLatin = /^[a-zA-Z\s]+$/.test(newName.trim());
     const avatarInitials = isLatin
       ? newName.trim().slice(0, 2).toUpperCase()
       : "👤";
 
     const newReviewObj = {
+      id: Date.now(), // დროებითი უნიკალური ID
       name: newName.trim(),
       text: newText.trim(),
-      rating: newRating,
+      rating: Number(newRating),
       avatar: avatarInitials,
+      created_at: new Date().toISOString(),
     };
 
-    try {
-      const { data, error } = await supabase
-        .from("reviews")
-        .insert([newReviewObj])
-        .select();
+    // ახალი კომენტარის დამატება სიის სათავეში
+    setReviews([newReviewObj, ...reviews]);
 
-      if (error) {
-        console.error("შეცდომა კომენტარის გაგზავნისას:", error.message);
-        alert("ვერ მოხერხდა გაგზავნა: " + error.message);
-      } else if (data && data.length > 0) {
-        setReviews([data[0], ...reviews]);
-        setNewName("");
-        setNewText("");
-        setNewRating(5);
-      } else {
-        const fallbackReview = {
-          ...newReviewObj,
-          id: Date.now(),
-          created_at: new Date().toISOString(),
-        };
-        setReviews([fallbackReview, ...reviews]);
-        setNewName("");
-        setNewText("");
-        setNewRating(5);
-      }
-    } catch (err) {
-      console.error("სერვერული შეცდომა:", err);
-    } finally {
-      setLoadingReview(false);
-    }
+    // ფორმის გასუფთავება
+    setNewName("");
+    setNewText("");
+    setNewRating(5);
   };
 
-  // უსაფრთხო ივენთ ჰენდლერი სურათის შეცდომისთვის
   const handleImageError = (e, fallbackBg) => {
     e.currentTarget.style.display = "none";
     if (e.currentTarget.parentNode) {
@@ -150,7 +114,7 @@ export default function Home() {
       }`}
     >
       {/* ══════════ NAVBAR ══════════ */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-950/85 backdrop-blur-md border-b border-white/5">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-950/90 backdrop-blur-md border-b border-white/5">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-14 sm:h-16">
           <Link
             to="/"
@@ -162,37 +126,57 @@ export default function Home() {
             <span className="text-amber-400">Cafe</span> Sunset
           </Link>
 
+          {/* დესკტოპ ნავიგაცია */}
           <div className="hidden sm:flex items-center gap-6 text-sm text-slate-300">
-            {["მთავარი", "მენიუ", "ჩვენ შესახებ", "კონტაქტი"].map(
-              (text, idx) => {
-                const paths = ["/", "/product", "/about", "/contact"];
-                return (
-                  <Link
-                    key={idx}
-                    to={paths[idx]}
-                    className="relative py-1 hover:text-amber-400 transition-colors duration-300 group"
-                  >
-                    {text}
-                    <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-400 transition-all duration-300 group-hover:w-full" />
-                  </Link>
-                );
-              },
-            )}
+            {NAV_LINKS.map((link, idx) => (
+              <Link
+                key={idx}
+                to={link.path}
+                className="relative py-1 hover:text-amber-400 transition-colors duration-300 group"
+              >
+                {link.text}
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-400 transition-all duration-300 group-hover:w-full" />
+              </Link>
+            ))}
           </div>
 
-          <a
-            href={`tel:${PHONE}`}
-            className="px-4 py-2 bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-bold rounded-xl text-xs sm:text-sm transition-all duration-200 shadow-md hover:shadow-amber-500/10"
-          >
-            📞 დარეზერვება
-          </a>
+          <div className="flex items-center gap-2">
+            <a
+              href={`tel:${PHONE}`}
+              className="px-4 py-2 bg-amber-500 hover:bg-amber-400 active:scale-95 text-slate-950 font-bold rounded-xl text-xs sm:text-sm transition-all duration-200 shadow-md"
+            >
+              📞 დარეზერვება
+            </a>
+
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="sm:hidden p-2 text-slate-300 hover:text-white transition-colors focus:outline-none"
+            >
+              {isMenuOpen ? "✕" : "☰"}
+            </button>
+          </div>
         </div>
+
+        {/* მობილურის მენიუ */}
+        {isMenuOpen && (
+          <div className="sm:hidden bg-slate-950/95 border-b border-white/5 px-4 py-3 space-y-2">
+            {NAV_LINKS.map((link, idx) => (
+              <Link
+                key={idx}
+                to={link.path}
+                onClick={() => setIsMenuOpen(false)}
+                className="block py-2 text-slate-300 hover:text-amber-400 font-medium text-sm transition-colors border-b border-white/5 last:border-none"
+              >
+                {link.text}
+              </Link>
+            ))}
+          </div>
+        )}
       </nav>
 
       {/* ══════════ HERO ══════════ */}
       <section className="relative bg-gradient-to-br from-slate-950 via-slate-900 to-amber-950 text-white overflow-hidden pt-14 sm:pt-16">
         <div className="absolute top-0 right-0 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-56 h-56 bg-orange-500/8 rounded-full blur-2xl pointer-events-none" />
         <div className="absolute inset-0 opacity-[0.025] bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:20px_20px]" />
 
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 lg:py-32">
@@ -217,13 +201,13 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row gap-3 pt-1 max-w-xs mx-auto sm:max-w-none lg:mx-0">
                 <Link
                   to="/product"
-                  className="flex-1 sm:flex-none px-7 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-bold rounded-2xl shadow-lg shadow-amber-500/20 transition-all duration-200 active:scale-[0.97] text-center text-sm sm:text-base hover:shadow-amber-500/30 hover:-translate-y-0.5"
+                  className="flex-1 sm:flex-none px-7 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-bold rounded-2xl shadow-lg transition-all duration-200 text-center text-sm sm:text-base hover:shadow-amber-500/30 hover:-translate-y-0.5"
                 >
                   სრული მენიუ
                 </Link>
                 <a
                   href={`tel:${PHONE}`}
-                  className="flex-1 sm:flex-none px-7 py-4 bg-white/5 hover:bg-white/10 text-white font-semibold rounded-2xl text-center border border-white/10 transition-all duration-200 text-sm sm:text-base hover:-translate-y-0.5 active:scale-[0.97]"
+                  className="flex-1 sm:flex-none px-7 py-4 bg-white/5 hover:bg-white/10 text-white font-semibold rounded-2xl text-center border border-white/10 transition-all duration-200 text-sm sm:text-base hover:-translate-y-0.5"
                 >
                   📞 მაგიდის დაჯავშნა
                 </a>
@@ -231,9 +215,9 @@ export default function Home() {
             </div>
 
             <div className="hidden lg:flex justify-center">
-              <div className="w-full max-w-sm h-72 xl:h-80 rounded-3xl overflow-hidden shadow-2xl border border-white/10 relative group transition-all duration-500 hover:border-amber-500/20">
+              <div className="w-full max-w-sm h-72 xl:h-80 rounded-3xl overflow-hidden shadow-2xl border border-white/10 relative group">
                 <img
-                  src={imgHero}
+                  src="/xedi.png"
                   alt="Cafe Sunset"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   onError={(e) =>
@@ -264,7 +248,7 @@ export default function Home() {
           ].map((s, i) => (
             <div
               key={i}
-              className="flex flex-col items-center justify-center py-5 sm:py-7 px-3 hover:bg-slate-50/50 transition-colors duration-300 cursor-default group"
+              className="flex flex-col items-center justify-center py-5 sm:py-7 px-3 group"
             >
               <p className="text-lg sm:text-2xl lg:text-3xl font-black text-slate-900 leading-none group-hover:scale-105 transition-transform duration-300">
                 {s.val}
@@ -287,13 +271,10 @@ export default function Home() {
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mt-2">
               სახლური სამზარეულო
             </h2>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              ახალი პროდუქტები ყოველდღე, ტრადიციული ქართული გემოები
-            </p>
           </div>
           <Link
             to="/product"
-            className="text-xs sm:text-sm font-bold text-slate-900 hover:text-amber-600 transition-colors flex items-center gap-1 shrink-0 ml-4 group"
+            className="text-xs sm:text-sm font-bold text-slate-900 hover:text-amber-600 transition-colors flex items-center gap-1 group"
           >
             სრული მენიუ{" "}
             <span className="group-hover:translate-x-1 transition-transform duration-300">
@@ -302,7 +283,7 @@ export default function Home() {
           </Link>
         </div>
 
-        <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory sm:grid sm:grid-cols-2 lg:grid-cols-3 sm:overflow-visible sm:pb-0 sm:gap-6 scrollbar-thin">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {PREVIEW_DISHES.map((dish, i) => {
             const colors = [
               "linear-gradient(135deg,#fef3c7,#fde68a)",
@@ -312,17 +293,16 @@ export default function Home() {
             return (
               <div
                 key={dish.id}
-                className="group flex-shrink-0 w-[75vw] sm:w-auto snap-start bg-white rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-200/60 transition-all duration-500 hover:-translate-y-2 hover:shadow-xl hover:shadow-amber-500/10 hover:border-amber-500/30 flex flex-col"
+                className="group bg-white rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-200/60 transition-all duration-500 hover:-translate-y-2 hover:shadow-xl flex flex-col"
               >
                 <div className="relative h-44 sm:h-52 overflow-hidden bg-slate-100">
                   <img
                     src={dish.img}
                     alt={dish.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                     onError={(e) => handleImageError(e, colors[i % 3])}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent" />
-                  <div className="absolute top-2.5 left-2.5 bg-slate-900/90 backdrop-blur-sm border border-amber-500/20 px-2 py-0.5 rounded-md">
+                  <div className="absolute top-2.5 left-2.5 bg-slate-900/90 backdrop-blur-sm px-2 py-0.5 rounded-md">
                     <span className="text-[9px] font-bold text-amber-400 uppercase tracking-wider">
                       {dish.tag}
                     </span>
@@ -331,7 +311,7 @@ export default function Home() {
 
                 <div className="p-4 sm:p-5 flex flex-col flex-1">
                   <div className="flex-1 mb-4">
-                    <h3 className="font-bold text-slate-900 text-sm sm:text-base tracking-tight group-hover:text-amber-600 transition-colors duration-300">
+                    <h3 className="font-bold text-slate-900 text-sm sm:text-base group-hover:text-amber-600 transition-colors">
                       {dish.name}
                     </h3>
                     <p className="text-xs text-slate-500 mt-1">{dish.desc}</p>
@@ -341,9 +321,9 @@ export default function Home() {
                   </div>
                   <Link
                     to="/product"
-                    className="w-full py-3 bg-slate-900 hover:bg-amber-500 hover:text-slate-950 text-white text-xs sm:text-sm font-semibold rounded-xl text-center transition-all duration-300 flex items-center justify-center gap-2 active:scale-[0.97]"
+                    className="w-full py-3 bg-slate-900 hover:bg-amber-500 hover:text-slate-950 text-white text-xs sm:text-sm font-semibold rounded-xl text-center transition-all duration-300"
                   >
-                    <span>🍽️</span> <span>სრული მენიუ</span>
+                    🍽️ სრული მენიუ
                   </Link>
                 </div>
               </div>
@@ -355,38 +335,33 @@ export default function Home() {
       {/* ══════════ REVIEWS ══════════ */}
       <section className="bg-slate-100 py-14 sm:py-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-10 sm:mb-14 space-y-2">
+          <div className="text-center mb-10 sm:mb-14">
             <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-700 text-[11px] font-bold tracking-widest uppercase">
               ⭐ სტუმრების შეფასებები
             </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mt-2">
               სტუმრები ამბობენ
             </h2>
-            <p className="text-sm text-slate-500">
-              4.8 ★ · {reviews.length} მიმოხილვა საიტზე
-            </p>
           </div>
 
-          <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory sm:grid sm:grid-cols-3 sm:overflow-visible sm:pb-0 sm:gap-6 mb-12 scrollbar-thin">
-            {reviews.map((r, i) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+            {reviews.map((r) => (
               <div
-                key={r.id || i}
-                className="flex-shrink-0 w-[80vw] sm:w-auto snap-start bg-white rounded-2xl sm:rounded-3xl border border-slate-200/60 p-5 sm:p-6 flex flex-col gap-4 hover:border-amber-500/20 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                key={r.id}
+                className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/60 p-5 sm:p-6 flex flex-col gap-4 hover:shadow-xl transition-all duration-300"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white font-bold text-xs shrink-0">
                     {r.avatar}
                   </div>
                   <div>
                     <p className="font-bold text-slate-900 text-sm">{r.name}</p>
                     <p className="text-[11px] text-slate-400">
-                      {r.created_at
-                        ? new Date(r.created_at).toLocaleDateString("ka-GE")
-                        : "ახლახან"}
+                      {new Date(r.created_at).toLocaleDateString("ka-GE")}
                     </p>
                   </div>
                   <div className="ml-auto text-amber-400 text-sm font-bold">
-                    {"★".repeat(Math.max(0, Math.min(5, r.rating || 5)))}
+                    {"★".repeat(r.rating)}
                   </div>
                 </div>
                 <p className="text-sm text-slate-600 leading-relaxed italic">
@@ -396,12 +371,11 @@ export default function Home() {
             ))}
           </div>
 
-          {/* ─── ახალი ფორმა კომენტარის დასაწერად ─── */}
+          {/* ფორმა ლოკალური დამატებისთვის */}
           <div className="max-w-xl mx-auto bg-white border border-slate-200 p-6 sm:p-8 rounded-3xl shadow-sm">
-            <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+            <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-4">
               ✍️ დატოვე შენი შეფასება
             </h3>
-
             <form onSubmit={handleReviewSubmit} className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
@@ -413,13 +387,13 @@ export default function Home() {
                   placeholder="მაგ: დავითი"
                   value={newName}
                   onChange={(e) => setNewName(e.target.value)}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-amber-500 transition-colors"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-amber-500"
                 />
               </div>
 
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
-                  შეფასება (ვარსკვლავები)
+                  შეფასება
                 </label>
                 <div className="flex gap-2 text-2xl">
                   {[1, 2, 3, 4, 5].map((star) => (
@@ -427,9 +401,7 @@ export default function Home() {
                       key={star}
                       type="button"
                       onClick={() => setNewRating(star)}
-                      className={`transition-transform duration-100 active:scale-90 ${
-                        star <= newRating ? "text-amber-400" : "text-slate-200"
-                      }`}
+                      className={`transition-transform active:scale-90 ${star <= newRating ? "text-amber-400" : "text-slate-200"}`}
                     >
                       ★
                     </button>
@@ -439,105 +411,42 @@ export default function Home() {
 
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">
-                  შენი აზრი (რა მოგეწონა / რა არა)
+                  შენი აზრი
                 </label>
                 <textarea
                   required
                   rows="3"
-                  placeholder="დაწერე შენი შთაბეჭდილება კერძებზე, სერვისზე..."
+                  placeholder="დაწერე შენი შთაბეჭდილება..."
                   value={newText}
                   onChange={(e) => setNewText(e.target.value)}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-amber-500 transition-colors resize-none"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-amber-500 resize-none"
                 />
               </div>
 
               <button
                 type="submit"
-                disabled={loadingReview}
-                className={`w-full py-3.5 bg-amber-500 hover:bg-amber-400 active:scale-[0.98] text-slate-950 font-bold rounded-xl text-sm transition-all duration-200 shadow-md ${
-                  loadingReview ? "opacity-50 cursor-not-allowed" : ""
-                }`}
+                className="w-full py-3.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-sm transition-all duration-200"
               >
-                {loadingReview ? "იგზავნება..." : "გაგზავნა ✨"}
+                გაგზავნა ✨
               </button>
             </form>
           </div>
         </div>
       </section>
 
-      {/* ══════════ MAP ══════════ */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-        <div className="flex items-end justify-between mb-5">
-          <div>
-            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-700 text-[11px] font-bold tracking-widest uppercase">
-              📍 მდებარეობა
-            </span>
-            <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight mt-2">
-              გვიპოვე სარფში
-            </h2>
-            <p className="text-xs text-slate-500 mt-1">GGFX+2WC, E70, სარფი</p>
-          </div>
-          <a
-            href="https://www.google.com/maps/place/Sunset+Sarpi/@41.5215,41.5492,15z"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs sm:text-sm font-bold text-slate-900 hover:text-amber-600 transition-colors flex items-center gap-1 shrink-0 ml-4 group"
-          >
-            Maps-ში გახსნა{" "}
-            <span className="group-hover:translate-x-1 transition-transform duration-300">
-              →
-            </span>
-          </a>
-        </div>
-
-        <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-200 shadow-sm group">
-          <iframe
-            title="Cafe Sunset მდებარეობა"
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1512.3!2d41.5492!3d41.5215!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4067b14067ab2d35%3A0x7b6cfdb2112423bb!2sSunset%20Sarpi!5e0!3m2!1ska!2sge!4v1700000000000"
-            width="100%"
-            height="300"
-            style={{ border: 0, display: "block" }}
-            allowFullScreen
-            loading="lazy"
-            referrerPolicy="no-referrer-when-downgrade"
-          />
-          <div className="absolute top-3 left-3 flex items-center gap-1.5 px-3 py-2 bg-slate-950/80 backdrop-blur-sm text-white text-xs font-semibold rounded-xl pointer-events-none">
-            <span>🌅</span>
-            <span>Cafe Sunset · სარფი</span>
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════ CTA ══════════ */}
+      {/* ══════════ FOOTER ══════════ */}
       <section className="bg-slate-950 text-white py-16 sm:py-24 px-4 text-center relative overflow-hidden">
-        <div className="absolute -left-16 -top-16 w-48 h-48 sm:w-72 sm:h-72 bg-amber-500/5 rounded-full blur-3xl" />
-        <div className="absolute right-0 bottom-0 w-56 h-56 bg-orange-500/5 rounded-full blur-3xl" />
-
         <div className="relative max-w-2xl mx-auto space-y-4 sm:space-y-6">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[11px] font-bold tracking-widest uppercase">
-            🌅 Cafe Sunset · სარფი
-          </span>
-          <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight leading-tight">
+          <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight">
             მოდი — მაგიდა გელოდება
           </h2>
-          <p className="text-sm sm:text-base text-slate-400 max-w-md mx-auto leading-relaxed">
-            ოჯახური სადილი, ჯგუფური შეხვედრა თუ რომანტიული საღამო — Cafe
-            Sunset-ში ყველასთვის ადგილი არის.
-          </p>
-
           <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
             <a
               href={`tel:${PHONE}`}
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-bold rounded-2xl shadow-lg shadow-amber-500/20 transition-all duration-300 hover:shadow-amber-500/40 hover:-translate-y-0.5 active:scale-[0.97]"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-bold rounded-2xl shadow-lg"
             >
               📞 {FORMATTED_PHONE}
             </a>
-            <Link
-              to="/contact"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/5 hover:bg-white/10 text-white font-semibold rounded-2xl border border-white/10 transition-all duration-300 hover:border-white/20 hover:-translate-y-0.5 active:scale-[0.97]"
-            >
-              📍 მისამართი და საათები
-            </Link>
           </div>
         </div>
       </section>
