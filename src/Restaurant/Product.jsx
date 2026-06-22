@@ -1,55 +1,156 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 
-const PREVIEW_DISHES = [
+// სრული მენიუს მონაცემები შენი ფოლდერის (public/) ფოტოების მიხედვით
+const ALL_DISHES = [
   {
     id: 1,
-    name: "ხაჭაპური",
-    desc: "ახალი ცომი, სახლის ყველი, კვერცხი",
+    name: "აჭარული ხაჭაპური",
+    desc: "ახალი ცომი, სახლის ყველი, კარაქი და კვერცხის გული",
     price: "12 ₾",
-    tag: "სახლის რეცეპტი",
+    category: "khachapuri",
+    tag: "პოპულარული",
     img: "/xachapuri.png",
   },
   {
     id: 2,
-    name: "ხინკალი",
-    desc: "ხელნაკეთი, საქონლის ხორცი, სუნელები",
+    name: "ხინკალი (კალაკური)",
+    desc: "ხელნაკეთი, საქონლისა და ღორის ნაზავი, ახალი მწვანილი და წვენი",
     price: "1.5 ₾ / ც",
+    category: "meat",
     tag: "საუკეთესო",
     img: "/xinkali.png",
   },
   {
     id: 3,
-    name: "ოჯახური",
-    desc: "ახალი ხორცი, ბოსტნეული, ღვინის სოუსი",
+    name: "ოჯახური ღორის ხორცით",
+    desc: "ახალი ხორცი, შემწვარი კარტოფილი, ხახვი და ქართული სუნელები",
     price: "15 ₾",
+    category: "meat",
     tag: "შეფის არჩევანი",
-    img: "/ojaxuri.png",
+    img: "/ojaxuri.jpeg", // გასწორდა .jpeg-ზე
+  },
+  {
+    id: 4,
+    name: "მწვადი საქონლის",
+    desc: "ნახშირზე შემწვარი რბილი ხორცი, ბროწეულის მარცვლებითა და ხახვით",
+    price: "18 ₾",
+    category: "meat",
+    tag: "ცეცხლიდან",
+    img: "/mtsvadi.jpeg", // გასწორდა .jpeg-ზე
+  },
+  {
+    id: 5,
+    name: "ბადრიჯანი ნიგვზით",
+    desc: "შემწვარი ბადრიჯანი ნიგვზის საკაზმით, სუნელებითა და ბროწეულით",
+    price: "10 ₾",
+    category: "salads",
+    tag: "ცივი კერძი",
+    img: "/badrijani.jpeg", // ახალი კერძი
+  },
+  {
+    id: 6,
+    name: "ცეზარი ქათმით",
+    desc: "კრუტონები, აისბერგი, შემწვარი ქათმის ფილე და საფირმო სოუსი",
+    price: "14 ₾",
+    category: "salads",
+    tag: "ევროპული",
+    img: "/cesari.jpeg", // ახალი კერძი
+  },
+  {
+    id: 7,
+    name: "ქართული სალათი ნიგვზით",
+    desc: "ახალი კიტრი და პომიდორი კახური ზეთით, მწვანილითა და ნიგვზით",
+    price: "9 ₾",
+    category: "salads",
+    tag: "ჯანსაღი",
+    img: "/nigvzianisalat.jpeg", // ახალი კერძი
+  },
+  {
+    id: 8,
+    name: "ცხელი ხარჩო",
+    desc: "ტრადიციული მეგრული ხარჩო ნოყიერი საქონლის ხორცითა და სუნელებით",
+    price: "12 ₾",
+    category: "soup",
+    tag: "ცხელი კერძი",
+    img: "/xarcho.png", // ახალი კერძი
+  },
+  {
+    id: 9,
+    name: "საფირმო სუპი",
+    desc: "ნაზი ბულიონი, ახალი ბოსტნეული და მწვანილი",
+    price: "8 ₾",
+    category: "soup",
+    tag: "დღის სუპი",
+    img: "/supi.png", // ახალი კერძი
+  },
+  {
+    id: 10,
+    name: "უნგრული გულაში",
+    desc: "სქელი წვნიანი რბილი ხორცით, კარტოფილითა და წიწაკით",
+    price: "13 ₾",
+    category: "soup",
+    tag: "ნოყიერი",
+    img: "/gulashi.png", // ახალი კერძი
+  },
+  {
+    id: 11,
+    name: "კარტოფილის პიურე",
+    desc: "ნაზი პიურე ნაღებითა და კარაქით",
+    price: "6 ₾",
+    category: "meat",
+    tag: "გარნირი",
+    img: "/Piure.png", // ახალი კერძი
+  },
+  {
+    id: 12,
+    name: "სახლის ლიმონათი",
+    desc: "ციტრუსების ახალი წვენი, პიტნა, გაზიანი წყალი და ყინული",
+    price: "5 ₾",
+    category: "drinks",
+    tag: "გამაგრილებელი",
+    img: "/Limonati.png", // გასწორდა დიდი L-ით
+  },
+  {
+    id: 13,
+    name: "არომატული ჩაი",
+    desc: "ნატურალური მთის ყვავილების ან შავი ჩაი ლიმონით",
+    price: "4 ₾",
+    category: "drinks",
+    tag: "ცხელი სასმელი",
+    img: "/chai.png", // ახალი კერძი
+  },
+  {
+    id: 14,
+    name: "ნალექიანი ყავა",
+    desc: "ახლად დაფქული არომატული ყავა ქვიშაზე",
+    price: "3.5 ₾",
+    category: "drinks",
+    tag: "ენერგია",
+    img: "/coffee.png", // ახალი კერძი
+  },
+  {
+    id: 15,
+    name: "თაფლის ბაქლავა",
+    desc: "ტრადიციული აღმოსავლური ნუსხა ბევრი ნიგვზითა და თაფლის სიროფით",
+    price: "6 ₾",
+    category: "dessert",
+    tag: "ტკბილეული",
+    img: "/baclava.jpeg", // ახალი კერძი
   },
 ];
 
-// საწყისი ლამაზი მიმოხილვები, რომლებიც ყოველთვის გამოჩნდება საიტზე
-const INITIAL_REVIEWS = [
-  {
-    id: 1,
-    name: "გიორგი",
-    text: "საუკეთესო ხაჭაპურია მთელ სანაპიროზე! გარემოც ძალიან მყუდროა.",
-    rating: 5,
-    avatar: "👤",
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: 2,
-    name: "ნინო",
-    text: "ხინკალი იყო უგემრიელესი, წვენით სავსე. აუცილებლად დავბრუნდებით!",
-    rating: 5,
-    avatar: "👤",
-    created_at: new Date().toISOString(),
-  },
+const CATEGORIES = [
+  { id: "all", text: "ყველა კერძი" },
+  { id: "khachapuri", text: "ხაჭაპური" },
+  { id: "meat", text: "ხორციანი & გარნირი" },
+  { id: "salads", text: "სალათები" },
+  { id: "soup", text: "წვნიანები" },
+  { id: "drinks", text: "სასმელები" },
+  { id: "dessert", text: "დესერტი" },
 ];
 
 const PHONE = "555133181";
-const FORMATTED_PHONE = "555 13 31 81";
 const NAV_LINKS = [
   { text: "მთავარი", path: "/" },
   { text: "მენიუ", path: "/product" },
@@ -57,48 +158,20 @@ const NAV_LINKS = [
   { text: "კონტაქტი", path: "/contact" },
 ];
 
-export default function Home() {
+export default function Product() {
   const [isVisible, setIsVisible] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  
-  // მიმოხილვები ინახება პირდაპირ აქ, ლოკალურად
-  const [reviews, setReviews] = useState(INITIAL_REVIEWS);
-
-  // ფორმის სტეიტები
-  const [newName, setNewName] = useState("");
-  const [newText, setNewText] = useState("");
-  const [newRating, setNewRating] = useState(5);
+  const [activeCategory, setActiveCategory] = useState("all");
 
   useEffect(() => {
     setIsVisible(true);
+    window.scrollTo(0, 0);
   }, []);
 
-  const handleReviewSubmit = (e) => {
-    e.preventDefault();
-    if (!newName.trim() || !newText.trim()) return;
-
-    const isLatin = /^[a-zA-Z\s]+$/.test(newName.trim());
-    const avatarInitials = isLatin
-      ? newName.trim().slice(0, 2).toUpperCase()
-      : "👤";
-
-    const newReviewObj = {
-      id: Date.now(), // დროებითი უნიკალური ID
-      name: newName.trim(),
-      text: newText.trim(),
-      rating: Number(newRating),
-      avatar: avatarInitials,
-      created_at: new Date().toISOString(),
-    };
-
-    // ახალი კომენტარის დამატება სიის სათავეში
-    setReviews([newReviewObj, ...reviews]);
-
-    // ფორმის გასუფთავება
-    setNewName("");
-    setNewText("");
-    setNewRating(5);
-  };
+  const filteredDishes =
+    activeCategory === "all"
+      ? ALL_DISHES
+      : ALL_DISHES.filter((dish) => dish.category === activeCategory);
 
   const handleImageError = (e, fallbackBg) => {
     e.currentTarget.style.display = "none";
@@ -120,7 +193,9 @@ export default function Home() {
             to="/"
             className="text-white font-black text-lg tracking-tight group flex items-center gap-1"
           >
-            <span className="group-hover:rotate-12 transition-transform duration-300">🌅</span>
+            <span className="group-hover:rotate-12 transition-transform duration-300">
+              🌅
+            </span>
             <span className="text-amber-400">Cafe</span> Sunset
           </Link>
 
@@ -130,10 +205,16 @@ export default function Home() {
               <Link
                 key={idx}
                 to={link.path}
-                className="relative py-1 hover:text-amber-400 transition-colors duration-300 group"
+                className={`relative py-1 hover:text-amber-400 transition-colors duration-300 group ${
+                  link.path === "/product" ? "text-amber-400" : ""
+                }`}
               >
                 {link.text}
-                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-400 transition-all duration-300 group-hover:w-full" />
+                <span
+                  className={`absolute bottom-0 left-0 h-0.5 bg-amber-400 transition-all duration-300 group-hover:w-full ${
+                    link.path === "/product" ? "w-full" : "w-0"
+                  }`}
+                />
               </Link>
             ))}
           </div>
@@ -163,7 +244,11 @@ export default function Home() {
                 key={idx}
                 to={link.path}
                 onClick={() => setIsMenuOpen(false)}
-                className="block py-2 text-slate-300 hover:text-amber-400 font-medium text-sm transition-colors border-b border-white/5 last:border-none"
+                className={`block py-2 font-medium text-sm transition-colors border-b border-white/5 last:border-none ${
+                  link.path === "/product"
+                    ? "text-amber-400"
+                    : "text-slate-300 hover:text-amber-400"
+                }`}
               >
                 {link.text}
               </Link>
@@ -172,244 +257,144 @@ export default function Home() {
         )}
       </nav>
 
-      {/* ══════════ HERO ══════════ */}
-      <section className="relative bg-gradient-to-br from-slate-950 via-slate-900 to-amber-950 text-white overflow-hidden pt-14 sm:pt-16">
-        <div className="absolute top-0 right-0 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute inset-0 opacity-[0.025] bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:20px_20px]" />
+      {/* ══════════ PAGE HEADER ══════════ */}
+      <section className="relative bg-gradient-to-br from-slate-950 via-slate-900 to-amber-950 text-white overflow-hidden pt-24 pb-12 sm:pt-32 sm:pb-16 text-center">
+        <div className="absolute top-0 right-0 w-64 h-64 bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 lg:py-32">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-            <div className="space-y-5 sm:space-y-7 text-center lg:text-left">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[11px] sm:text-xs font-bold tracking-widest uppercase">
-                🌅 სარფი, ბათუმი · ოჯახური სამზარეულო
-              </span>
-
-              <h1 className="text-[2.2rem] leading-tight sm:text-5xl lg:text-6xl font-extrabold tracking-tight">
-                გემო, სადაც{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-orange-300 to-yellow-300">
-                  მზე ჩადის
-                </span>
-              </h1>
-
-              <p className="text-sm sm:text-base lg:text-lg text-slate-300 leading-relaxed max-w-md mx-auto lg:mx-0">
-                ოჯახური სამზარეულო ბათუმის სანაპიროზე. ახალი პროდუქტები, სახლური გემო და სანახაობა, რომელიც გამახსოვრდება.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-3 pt-1 max-w-xs mx-auto sm:max-w-none lg:mx-0">
-                <Link
-                  to="/product"
-                  className="flex-1 sm:flex-none px-7 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-bold rounded-2xl shadow-lg transition-all duration-200 text-center text-sm sm:text-base hover:shadow-amber-500/30 hover:-translate-y-0.5"
-                >
-                  სრული მენიუ
-                </Link>
-                <a
-                  href={`tel:${PHONE}`}
-                  className="flex-1 sm:flex-none px-7 py-4 bg-white/5 hover:bg-white/10 text-white font-semibold rounded-2xl text-center border border-white/10 transition-all duration-200 text-sm sm:text-base hover:-translate-y-0.5"
-                >
-                  📞 მაგიდის დაჯავშნა
-                </a>
-              </div>
-            </div>
-
-            <div className="hidden lg:flex justify-center">
-              <div className="w-full max-w-sm h-72 xl:h-80 rounded-3xl overflow-hidden shadow-2xl border border-white/10 relative group">
-                <img
-                  src="/xedi.png"
-                  alt="Cafe Sunset"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                  onError={(e) => handleImageError(e, "linear-gradient(135deg, #1e293b 0%, #78350f 100%)")}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 to-transparent" />
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-slate-950/80 text-amber-400 border border-amber-500/20 px-4 py-1.5 rounded-lg text-xs font-black tracking-wider uppercase whitespace-nowrap backdrop-blur-sm">
-                  ★ 4.8 · {reviews.length} მიმოხილვა
-                </div>
-              </div>
-            </div>
-          </div>
+        <div className="relative max-w-4xl mx-auto px-4">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[11px] font-bold tracking-widest uppercase">
+            ✨ ტრადიციული & თანამედროვე
+          </span>
+          <h1 className="text-3xl sm:text-5xl font-black tracking-tight mt-3">
+            ჩვენი <span className="text-amber-400">მენიუ</span>
+          </h1>
+          <p className="text-xs sm:text-sm text-slate-400 mt-2 max-w-md mx-auto">
+            ყველა კერძი მზადდება ნატურალური, ადგილობრივი პროდუქტებითა და ძველი
+            ოჯახური რეცეპტების ერთგულებით.
+          </p>
         </div>
       </section>
 
-      {/* ══════════ STATS BAR ══════════ */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-8 relative z-20">
-        <div className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/60 shadow-xl grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0 divide-slate-100">
-          {[
-            { val: "4.8 ★", label: "საშ. შეფასება" },
-            { val: reviews.length.toString(), label: "მიმოხილვა" },
-            { val: "10–20 ₾", label: "ერთ ადამიანზე" },
-            { val: "სარფი", label: "მდებარეობა" },
-          ].map((s, i) => (
-            <div key={i} className="flex flex-col items-center justify-center py-5 sm:py-7 px-3 group">
-              <p className="text-lg sm:text-2xl lg:text-3xl font-black text-slate-900 leading-none group-hover:scale-105 transition-transform duration-300">
-                {s.val}
-              </p>
-              <p className="text-[10px] sm:text-xs text-slate-500 font-medium mt-1.5 text-center leading-snug">
-                {s.label}
-              </p>
-            </div>
+      {/* ══════════ CATEGORY FILTERS ══════════ */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-4">
+        <div className="flex items-center justify-start sm:justify-center gap-2 overflow-x-auto pb-3 scrollbar-hide no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
+          {CATEGORIES.map((cat) => (
+            <button
+              key={cat.id}
+              onClick={() => setActiveCategory(cat.id)}
+              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold tracking-wide transition-all duration-200 whitespace-nowrap active:scale-95 ${
+                activeCategory === cat.id
+                  ? "bg-slate-900 text-amber-400 shadow-md shadow-slate-900/10 border-transparent"
+                  : "bg-white text-slate-600 border border-slate-200 hover:border-slate-300 hover:text-slate-900"
+              }`}
+            >
+              {cat.text}
+            </button>
           ))}
         </div>
-      </div>
+      </section>
 
-      {/* ══════════ MENU PREVIEW ══════════ */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 pb-12">
-        <div className="flex items-end justify-between mb-8 sm:mb-12">
-          <div>
-            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-700 text-[11px] font-bold tracking-widest uppercase">
-              🍽️ პოპულარული კერძები
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mt-2">
-              სახლური სამზარეულო
-            </h2>
-          </div>
-          <Link
-            to="/product"
-            className="text-xs sm:text-sm font-bold text-slate-900 hover:text-amber-600 transition-colors flex items-center gap-1 group"
-          >
-            სრული მენიუ <span className="group-hover:translate-x-1 transition-transform duration-300">→</span>
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {PREVIEW_DISHES.map((dish, i) => {
-            const colors = ["linear-gradient(135deg,#fef3c7,#fde68a)", "linear-gradient(135deg,#fee2e2,#fecaca)", "linear-gradient(135deg,#dcfce7,#bbf7d0)"];
+      {/* ══════════ DISHES GRID ══════════ */}
+      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-20">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {filteredDishes.map((dish, i) => {
+            const colors = [
+              "linear-gradient(135deg,#fef3c7,#fde68a)",
+              "linear-gradient(135deg,#fee2e2,#fecaca)",
+              "linear-gradient(135deg,#dcfce7,#bbf7d0)",
+              "linear-gradient(135deg,#e0f2fe,#bae6fd)",
+            ];
             return (
-              <div key={dish.id} className="group bg-white rounded-2xl sm:rounded-3xl overflow-hidden border border-slate-200/60 transition-all duration-500 hover:-translate-y-2 hover:shadow-xl flex flex-col">
-                <div className="relative h-44 sm:h-52 overflow-hidden bg-slate-100">
+              <div
+                key={dish.id}
+                className="group bg-white rounded-2xl overflow-hidden border border-slate-200/60 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl flex flex-col scale-100 opacity-100"
+                style={{
+                  animation: "fadeIn 0.4s ease-out forwards",
+                }}
+              >
+                <div className="relative h-44 sm:h-48 overflow-hidden bg-slate-100">
                   <img
                     src={dish.img}
                     alt={dish.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                    onError={(e) => handleImageError(e, colors[i % 3])}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    onError={(e) =>
+                      handleImageError(e, colors[i % colors.length])
+                    }
                   />
                   <div className="absolute top-2.5 left-2.5 bg-slate-900/90 backdrop-blur-sm px-2 py-0.5 rounded-md">
-                    <span className="text-[9px] font-bold text-amber-400 uppercase tracking-wider">{dish.tag}</span>
+                    <span className="text-[9px] font-bold text-amber-400 uppercase tracking-wider">
+                      {dish.tag}
+                    </span>
                   </div>
                 </div>
 
-                <div className="p-4 sm:p-5 flex flex-col flex-1">
+                <div className="p-4 flex flex-col flex-1">
                   <div className="flex-1 mb-4">
-                    <h3 className="font-bold text-slate-900 text-sm sm:text-base group-hover:text-amber-600 transition-colors">
+                    <h3 className="font-bold text-slate-900 text-sm sm:text-base group-hover:text-amber-600 transition-colors line-clamp-1">
                       {dish.name}
                     </h3>
-                    <p className="text-xs text-slate-500 mt-1">{dish.desc}</p>
-                    <p className="text-lg sm:text-xl font-black text-slate-900 mt-2">{dish.price}</p>
+                    <p className="text-xs text-slate-500 mt-1 line-clamp-2 h-8 leading-relaxed">
+                      {dish.desc}
+                    </p>
+                    <p className="text-base sm:text-lg font-black text-slate-900 mt-2">
+                      {dish.price}
+                    </p>
                   </div>
-                  <Link
-                    to="/product"
-                    className="w-full py-3 bg-slate-900 hover:bg-amber-500 hover:text-slate-950 text-white text-xs sm:text-sm font-semibold rounded-xl text-center transition-all duration-300"
+
+                  <a
+                    href={`tel:${PHONE}`}
+                    className="w-full py-2.5 bg-slate-950 hover:bg-amber-500 hover:text-slate-950 text-white text-xs font-bold rounded-xl text-center transition-all duration-300 shadow-sm"
                   >
-                    🍽️ სრული მენიუ
-                  </Link>
+                    📞 შეკვეთა / დაჯავშნა
+                  </a>
                 </div>
               </div>
             );
           })}
         </div>
-      </section>
 
-      {/* ══════════ REVIEWS ══════════ */}
-      <section className="bg-slate-100 py-14 sm:py-20">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-10 sm:mb-14">
-            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-700 text-[11px] font-bold tracking-widest uppercase">
-              ⭐ სტუმრების შეფასებები
-            </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mt-2">
-              სტუმრები ამბობენ
-            </h2>
+        {filteredDishes.length === 0 && (
+          <div className="text-center py-12 text-slate-400 text-sm font-medium">
+            ამ კატეგორიაში კერძები დროებით მიუწვდომელია.
           </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-            {reviews.map((r) => (
-              <div key={r.id} className="bg-white rounded-2xl sm:rounded-3xl border border-slate-200/60 p-5 sm:p-6 flex flex-col gap-4 hover:shadow-xl transition-all duration-300">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white font-bold text-xs shrink-0">
-                    {r.avatar}
-                  </div>
-                  <div>
-                    <p className="font-bold text-slate-900 text-sm">{r.name}</p>
-                    <p className="text-[11px] text-slate-400">
-                      {new Date(r.created_at).toLocaleDateString("ka-GE")}
-                    </p>
-                  </div>
-                  <div className="ml-auto text-amber-400 text-sm font-bold">
-                    {"★".repeat(r.rating)}
-                  </div>
-                </div>
-                <p className="text-sm text-slate-600 leading-relaxed italic">"{r.text}"</p>
-              </div>
-            ))}
-          </div>
-
-          {/* ფორმა ლოკალური დამატებისთვის */}
-          <div className="max-w-xl mx-auto bg-white border border-slate-200 p-6 sm:p-8 rounded-3xl shadow-sm">
-            <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-4">✍️ დატოვე შენი შეფასება</h3>
-            <form onSubmit={handleReviewSubmit} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">შენი სახელი</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="მაგ: დავითი"
-                  value={newName}
-                  onChange={(e) => setNewName(e.target.value)}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-amber-500"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">შეფასება</label>
-                <div className="flex gap-2 text-2xl">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <button
-                      key={star}
-                      type="button"
-                      onClick={() => setNewRating(star)}
-                      className={`transition-transform active:scale-90 ${star <= newRating ? "text-amber-400" : "text-slate-200"}`}
-                    >
-                      ★
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">შენი აზრი</label>
-                <textarea
-                  required
-                  rows="3"
-                  placeholder="დაწერე შენი შთაბეჭდილება..."
-                  value={newText}
-                  onChange={(e) => setNewText(e.target.value)}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:border-amber-500 resize-none"
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full py-3.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-sm transition-all duration-200"
-              >
-                გაგზავნა ✨
-              </button>
-            </form>
-          </div>
-        </div>
+        )}
       </section>
 
       {/* ══════════ FOOTER ══════════ */}
-      <section className="bg-slate-950 text-white py-16 sm:py-24 px-4 text-center relative overflow-hidden">
-        <div className="relative max-w-2xl mx-auto space-y-4 sm:space-y-6">
-          <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight">მოდი — მაგიდა გელოდება</h2>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
-            <a
-              href={`tel:${PHONE}`}
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-bold rounded-2xl shadow-lg"
+      <footer className="bg-slate-950 text-white py-12 px-4 text-center border-t border-white/5">
+        <div className="max-w-2xl mx-auto space-y-4">
+          <p className="text-xs text-slate-500 font-medium">
+            © {new Date().getFullYear()} Cafe Sunset. ყველა უფლება დაცულია.
+          </p>
+          <div className="flex justify-center gap-4 text-xs text-slate-400">
+            <Link to="/" className="hover:text-amber-400 transition-colors">
+              მთავარი
+            </Link>
+            <span>·</span>
+            <Link
+              to="/about"
+              className="hover:text-amber-400 transition-colors"
             >
-              📞 {FORMATTED_PHONE}
-            </a>
+              ჩვენ შესახებ
+            </Link>
+            <span>·</span>
+            <Link
+              to="/contact"
+              className="hover:text-amber-400 transition-colors"
+            >
+              კონტაქტი
+            </Link>
           </div>
         </div>
-      </section>
+      </footer>
+
+      {/* საჭირო მარტივი ანიმაციის სტილი ფილტრებისთვის */}
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(8px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </div>
   );
 }
