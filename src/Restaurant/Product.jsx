@@ -28,7 +28,7 @@ const ALL_DISHES = [
     price: "15 ₾",
     category: "meat",
     tag: "შეფის არჩევანი",
-    img: "/ojaxuri.jpeg", // გასწორდა .jpeg-ზე
+    img: "/ojaxuri.jpeg",
   },
   {
     id: 4,
@@ -37,7 +37,7 @@ const ALL_DISHES = [
     price: "18 ₾",
     category: "meat",
     tag: "ცეცხლიდან",
-    img: "/mtsvadi.jpeg", // გასწორდა .jpeg-ზე
+    img: "/mtsvadi.jpeg",
   },
   {
     id: 5,
@@ -46,7 +46,7 @@ const ALL_DISHES = [
     price: "10 ₾",
     category: "salads",
     tag: "ცივი კერძი",
-    img: "/badrijani.jpeg", // ახალი კერძი
+    img: "/badrijani.jpeg",
   },
   {
     id: 6,
@@ -55,7 +55,7 @@ const ALL_DISHES = [
     price: "14 ₾",
     category: "salads",
     tag: "ევროპული",
-    img: "/cesari.jpeg", // ახალი კერძი
+    img: "/cesari.jpeg",
   },
   {
     id: 7,
@@ -64,7 +64,7 @@ const ALL_DISHES = [
     price: "9 ₾",
     category: "salads",
     tag: "ჯანსაღი",
-    img: "/nigvzianisalat.jpeg", // ახალი კერძი
+    img: "/nigvzianisalat.jpeg",
   },
   {
     id: 8,
@@ -73,7 +73,7 @@ const ALL_DISHES = [
     price: "12 ₾",
     category: "soup",
     tag: "ცხელი კერძი",
-    img: "/xarcho.png", // ახალი კერძი
+    img: "/xarcho.png",
   },
   {
     id: 9,
@@ -82,7 +82,7 @@ const ALL_DISHES = [
     price: "8 ₾",
     category: "soup",
     tag: "დღის სუპი",
-    img: "/supi.png", // ახალი კერძი
+    img: "/supi.png",
   },
   {
     id: 10,
@@ -91,7 +91,7 @@ const ALL_DISHES = [
     price: "13 ₾",
     category: "soup",
     tag: "ნოყიერი",
-    img: "/gulashi.png", // ახალი კერძი
+    img: "/gulashi.png",
   },
   {
     id: 11,
@@ -100,7 +100,7 @@ const ALL_DISHES = [
     price: "6 ₾",
     category: "meat",
     tag: "გარნირი",
-    img: "/Piure.png", // ახალი კერძი
+    img: "/Piure.png",
   },
   {
     id: 12,
@@ -109,7 +109,7 @@ const ALL_DISHES = [
     price: "5 ₾",
     category: "drinks",
     tag: "გამაგრილებელი",
-    img: "/Limonati.png", // გასწორდა დიდი L-ით
+    img: "/Limonati.png",
   },
   {
     id: 13,
@@ -118,7 +118,7 @@ const ALL_DISHES = [
     price: "4 ₾",
     category: "drinks",
     tag: "ცხელი სასმელი",
-    img: "/chai.png", // ახალი კერძი
+    img: "/chai.png",
   },
   {
     id: 14,
@@ -127,7 +127,7 @@ const ALL_DISHES = [
     price: "3.5 ₾",
     category: "drinks",
     tag: "ენერგია",
-    img: "/coffee.png", // ახალი კერძი
+    img: "/coffee.png",
   },
   {
     id: 15,
@@ -136,7 +136,7 @@ const ALL_DISHES = [
     price: "6 ₾",
     category: "dessert",
     tag: "ტკბილეული",
-    img: "/baclava.jpeg", // ახალი კერძი
+    img: "/baclava.jpeg",
   },
 ];
 
@@ -312,11 +312,12 @@ export default function Product() {
                   animation: "fadeIn 0.4s ease-out forwards",
                 }}
               >
-                <div className="relative h-44 sm:h-48 overflow-hidden bg-slate-100">
+                {/* გასწორდა: bg-white დაემატა და შეიცვალა object-contain-ით */}
+                <div className="relative h-44 sm:h-48 overflow-hidden bg-white flex items-center justify-center">
                   <img
                     src={dish.img}
                     alt={dish.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-contain object-center group-hover:scale-105 transition-transform duration-500"
                     onError={(e) =>
                       handleImageError(e, colors[i % colors.length])
                     }
