@@ -24,7 +24,7 @@ const PREVIEW_DISHES = [
     desc: "ახალი ხორცი, ბოსტნეული, ღვინის სოუსი",
     price: "15 ₾",
     tag: "შეფის არჩევანი",
-    img: "/ojaxuri.png",
+    img: "/ojaxuri.jpeg",
   },
 ];
 
